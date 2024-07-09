@@ -235,25 +235,39 @@
   }
 
   function init_portfolio_details() { 
-    $(".show-portfolio").on("click", function() {
+    $(".show-portfolio").on("click", function(event) {
+      event.preventDefault(); // Prevent the default anchor click behavior
       var $this = $(this);
       var $el = $("#show-portofolio-details");
       var $wrap = $("#portofolio-details");
       $wrap.addClass('uk-animation-toggle');
       UIkit.modal($el).show();
-
-      //show loading first
+      
+      // Show loading first
       $wrap.html(
         '<div class="uk-position-center  uk-text-center">' +
           "<div data-uk-spinner></div> " +
         "</div>"
       ); 
       
-      $.post($this.attr("href"), function(data) {
-        $wrap.html(data); 
-        $wrap.removeClass('uk-animation-toggle');
+      $.ajax({
+        url: $this.attr("href"),
+        type: 'GET',
+        success: function(data) {
+          $wrap.html(data); 
+          $wrap.removeClass('uk-animation-toggle');
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          $wrap.html(
+            '<div class="uk-position-center uk-text-center">' +
+              "<p>Error loading project details. Please try again later.</p>" +
+            "</div>"
+          );
+          console.log("Error: " + textStatus, errorThrown);
+        }
       });
-      return false;
     });
   }
+
+
 })(jQuery);
